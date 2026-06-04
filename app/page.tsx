@@ -119,7 +119,7 @@ export default function Home() {
         <button
           onClick={sendMessage}
           disabled={loading}
-          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
+          className="-z-50 rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
         >
           <FontAwesomeIcon icon={faPaperPlane} />
         </button>
