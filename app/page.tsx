@@ -75,7 +75,7 @@ export default function Home() {
       {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
 
-      <div className="mb-4 flex-1 space-y-4 overflow-y-auto rounded-lg border p-4 ">
+      <div className="mb-4 h-[70vh] overflow-y-auto rounded-lg border p-4 ">
         {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
