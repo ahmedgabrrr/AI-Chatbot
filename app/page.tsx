@@ -103,16 +103,16 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
+
       <div className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2 w-full">
         <input
           type="text"
           value={input}
           placeholder="Ask anything..."
           onChange={(e) => setInput(e.target.value)}
-          
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              e.preventDefault(); 
+              e.preventDefault();
               sendMessage();
             }
           }}
@@ -120,14 +120,11 @@ export default function Home() {
         />
 
         <button
-          type="button" 
+          type="button"
           onClick={sendMessage}
-          onTouchEnd={(e) => {
-            e.preventDefault(); 
-            sendMessage();
-          }}
           disabled={loading}
-          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50 shrink-0"
+
+          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50 shrink-0 cursor-pointer active:scale-95 transition-transform"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="pointer-events-none" />
         </button>
