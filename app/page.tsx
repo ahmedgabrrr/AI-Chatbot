@@ -1,7 +1,7 @@
 "use client";
 import avatar from "@/public/avat.png"
 import Image from "next/image";
-import { useState,useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,25 +10,22 @@ type Message = {
   content: string;
 };
 
-
-
 export default function Home() {
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
 
-
   const sendMessage = async () => {
-    alert("clicked")
     if (!input.trim() || loading) return;
+
     const userMessage: Message = {
       role: "user",
       content: input,
@@ -47,7 +44,7 @@ export default function Home() {
         body: JSON.stringify({
           messages: updatedMessages,
         })
-      })
+      });
       const data = await res.json();
       const aiMessage: Message = {
         role: "assistant",
@@ -56,7 +53,6 @@ export default function Home() {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error(error);
-
       setMessages((prev) => [
         ...prev,
         {
@@ -67,15 +63,14 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
 
-
-  }
   return (
     <main className="mx-auto flex h-screen max-w-4xl flex-col p-4">
       {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
-
-      <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 ">
+      {/* إضافة space-y-3 لعمل مسافات بين رسائل الشات */}
+      <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 space-y-3">
         {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
@@ -86,8 +81,8 @@ export default function Home() {
           <div
             key={index}
             className={`max-w-[85%] md:max-w-[70%] rounded-xl p-3 ${message.role === "user"
-              ? "ml-auto bg-sky-800 text-white"
-              : "bg-gray-200 text-black"
+                ? "ml-auto bg-sky-800 text-white"
+                : "bg-gray-200 text-black"
               }`}
           >
             {message.content}
@@ -102,30 +97,31 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="z-50 sticky bottom-0 flex gap-2 border-t bg-white p-2">
+      {/* تحويل الحاوية إلى فورم وحل مشكلة الـ z-index للموبايل */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // منع تحديث الصفحة عند الإرسال
+          sendMessage();
+        }}
+        className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2"
+      >
         <input
           type="text"
           value={input}
           placeholder="Ask anything..."
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              sendMessage();
-            }
-          }}
           className="flex-1 rounded-lg border p-3"
         />
 
-        
-
-      </div>
-      <button
-        onClick={sendMessage}
-        disabled={loading}
-        className="-z-50 rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
-      >
-        <FontAwesomeIcon icon={faPaperPlane} />
-      </button>
+        <button
+          type="submit" /* تحويل الزرار لنوع submit ليتحكم بالفورم تلقائياً */
+          disabled={loading}
+          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
+        >
+          {/* إضافة pointer-events-none للأيقونة لضمان وصول النقرة للزرار مباشرة */}
+          <FontAwesomeIcon icon={faPaperPlane} className="pointer-events-none" />
+        </button>
+      </form>
     </main>
   );
 }
