@@ -2,6 +2,8 @@
 import avatar from "@/public/avat.png"
 import Image from "next/image";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 type Message = {
   role: "user" | "assistant";
@@ -105,13 +107,12 @@ export default function Home() {
           className="flex-1 rounded-lg border p-3"
         />
 
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-          className="bg-sky-800 text-white rounded-lg border px-5 py-3"
-        >
-          Send
-        </button>
+        <div className="bg-sky-800 text-white rounded-lg border px-5 py-3" onClick={sendMessage}>
+          <FontAwesomeIcon
+       
+            icon={faPaperPlane} />
+          </div>
+
       </div>
     </main>
   );
