@@ -27,6 +27,7 @@ export default function Home() {
 
 
   const sendMessage = async () => {
+    alert("clicked")
     if (!input.trim() || loading) return;
     const userMessage: Message = {
       role: "user",
