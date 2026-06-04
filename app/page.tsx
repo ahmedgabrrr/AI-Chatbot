@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import avatar from "@/public/avat.png"
+import Image from "next/image";
+import { useState,useEffect,useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,88 +10,71 @@ type Message = {
   content: string;
 };
 
+
+
 export default function Home() {
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
-  
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
-      behavior: "auto",
+      behavior: "smooth",
     });
   }, [messages]);
 
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-
     const userMessage: Message = {
       role: "user",
       content: input,
     };
-
-
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage],
+          messages: updatedMessages,
         })
-      });
-
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`سيرفر Vercel أرجع خطأ (${res.status}): ${errorText}`);
-      }
-
-     
+      })
       const data = await res.json();
-
-  
-      const replyText = data?.text || data?.reply || data?.response || (data?.choices && data?.choices[0]?.message?.content);
-
-      if (!replyText) {
-        throw new Error("الطلب نجح ولكن السيرفر أرسل رداً فارغاً! تأكد من ملف api/chat");
-      }
-
       const aiMessage: Message = {
         role: "assistant",
-        content: replyText,
+        content: data.text,
       };
-
-   
       setMessages((prev) => [...prev, aiMessage]);
-
     } catch (error) {
-      console.error("مخطط الخطأ في الموبايل:", error);
+      console.error(error);
 
-    
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `⚠️ تنبيه من الموبايل - ${error instanceof Error ? error.message : "انقطع الاتصال بالـ API"}`,
+          content: "Something went wrong.",
         },
       ]);
     } finally {
       setLoading(false);
     }
-  };
+
+
+  }
   return (
-    <main className="mx-auto flex h-[dvh] max-w-4xl flex-col p-4 justify-between">
+    <main className="mx-auto flex h-screen max-w-4xl flex-col p-4">
+      {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
 
-      <div className="flex-1 overflow-y-auto rounded-lg border p-4 space-y-3 mb-2">
+      <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 ">
         {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
@@ -99,11 +84,10 @@ export default function Home() {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`max-w-[85%] md:max-w-[70%] rounded-xl p-3 ${
-              message.role === "user"
-                ? "ml-auto bg-sky-800 text-white"
-                : "bg-gray-200 text-black"
-            }`}
+            className={`max-w-[85%] md:max-w-[70%] rounded-xl p-3 ${message.role === "user"
+              ? "ml-auto bg-sky-800 text-white"
+              : "bg-gray-200 text-black"
+              }`}
           >
             {message.content}
           </div>
@@ -117,8 +101,7 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-
-      <div className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2 w-full">
+      <div className="sticky bottom-0 flex gap-2 border-t bg-white p-2">
         <input
           type="text"
           value={input}
@@ -126,22 +109,20 @@ export default function Home() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              e.preventDefault();
               sendMessage();
             }
           }}
-          className="flex-1 rounded-lg border p-3 min-w-0"
+          className="flex-1 rounded-lg border p-3"
         />
 
         <button
-          type="button"
           onClick={sendMessage}
           disabled={loading}
-
-          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50 shrink-0 cursor-pointer active:scale-95 transition-transform"
+          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
         >
-          <FontAwesomeIcon icon={faPaperPlane} className="pointer-events-none" />
+          <FontAwesomeIcon icon={faPaperPlane} />
         </button>
+
       </div>
     </main>
   );
