@@ -101,13 +101,7 @@ export default function Home() {
         )}
         <div ref={bottomRef} />
       </div>
-      <button
-        onClick={sendMessage}
-        disabled={loading}
-        className="-z-50 rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
-      >
-        <FontAwesomeIcon icon={faPaperPlane} />
-      </button>
+
       <div className="z-50 sticky bottom-0 flex gap-2 border-t bg-white p-2">
         <input
           type="text"
@@ -125,6 +119,13 @@ export default function Home() {
         
 
       </div>
+      <button
+        onClick={sendMessage}
+        disabled={loading}
+        className="-z-50 rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
+      >
+        <FontAwesomeIcon icon={faPaperPlane} />
+      </button>
     </main>
   );
 }
