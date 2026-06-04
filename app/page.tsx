@@ -1,4 +1,6 @@
 "use client";
+import avatar from "@/public/avat.png"
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -21,13 +23,18 @@ export default function Home() {
     });
   }, [messages]);
 
-  const sendMessage = async () => {
+  const sendMessage = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault(); 
+    }
+
     if (!input.trim() || loading) return;
 
     const userMessage: Message = {
       role: "user",
       content: input,
     };
+
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput("");
@@ -43,10 +50,18 @@ export default function Home() {
           messages: updatedMessages,
         })
       });
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
       const data = await res.json();
+
+      const replyText = data.text || data.reply || data.response || (data.choices && data.choices[0]?.message?.content) || "No response text";
+
       const aiMessage: Message = {
         role: "assistant",
-        content: data.text,
+        content: replyText,
       };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
@@ -55,7 +70,7 @@ export default function Home() {
         ...prev,
         {
           role: "assistant",
-          content: "Something went wrong.",
+          content: `Error: ${error instanceof Error ? error.message : "Connection failed"}`,
         },
       ]);
     } finally {
@@ -93,13 +108,9 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendMessage();
-        }}
-        className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2"
+        onSubmit={sendMessage}
+        className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2 w-full"
       >
         <input
           type="text"
@@ -110,7 +121,7 @@ export default function Home() {
         />
 
         <button
-          type="submit" 
+          type="submit"
           disabled={loading}
           className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50 shrink-0"
         >
