@@ -76,11 +76,11 @@ export default function Home() {
 
 
       <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 ">
-        {/* {messages.length === 0 && (
+        {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
           </p>
-        )} */}
+        )}
 
         {messages.map((message, index) => (
           <div
@@ -102,7 +102,7 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="sticky bottom-0 flex gap-2 border-t bg-white p-2">
+      <div className="z-50 sticky bottom-0 flex gap-2 border-t bg-white p-2">
         <input
           type="text"
           value={input}
