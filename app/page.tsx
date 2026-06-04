@@ -1,7 +1,7 @@
 "use client";
 import avatar from "@/public/avat.png"
 import Image from "next/image";
-import { useState } from "react";
+import { useState,useEffect,useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,6 +17,13 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
 
   const sendMessage = async () => {
@@ -63,8 +70,8 @@ export default function Home() {
 
   }
   return (
-    <main className="mx-auto flex h-screen max-w-4xl flex-col p-4">
-      <Image className="h-40 w-80" src={avatar} alt="avatar" />
+    <main className="mx-auto flex h-dvh w-full max-w-4xl flex-col p-2 md:p-4">
+      {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
 
       <div className="mb-4 flex-1 space-y-4 overflow-y-auto rounded-lg border p-4 ">
@@ -77,8 +84,8 @@ export default function Home() {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`max-w-[80%] rounded-xl p-3 ${message.role === "user"
-              ? "ml-auto bg-sky-800 -500 text-white"
+            className={`max-w-[85%] md:max-w-[70%] rounded-xl p-3 ${message.role === "user"
+              ? "ml-auto bg-sky-800 text-white"
               : "bg-gray-200 text-black"
               }`}
           >
@@ -91,9 +98,10 @@ export default function Home() {
             Thinking...
           </div>
         )}
+        <div ref={bottomRef} />
       </div>
 
-      <div className="flex gap-2">
+      <div className="sticky bottom-0 flex gap-2 border-t bg-white p-2">
         <input
           type="text"
           value={input}
@@ -107,11 +115,13 @@ export default function Home() {
           className="flex-1 rounded-lg border p-3"
         />
 
-        <div className="bg-sky-800 text-white rounded-lg border px-5 py-3" onClick={sendMessage}>
-          <FontAwesomeIcon
-       
-            icon={faPaperPlane} />
-          </div>
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
+        >
+          <FontAwesomeIcon icon={faPaperPlane} />
+        </button>
 
       </div>
     </main>
