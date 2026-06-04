@@ -1,6 +1,4 @@
 "use client";
-import avatar from "@/public/avat.png"
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -19,7 +17,7 @@ export default function Home() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
-      behavior: "smooth",
+      behavior: "auto",
     });
   }, [messages]);
 
@@ -67,9 +65,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto flex h-screen max-w-4xl flex-col p-4">
-      {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
-      {/* إضافة space-y-3 لعمل مسافات بين رسائل الشات */}
       <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 space-y-3">
         {messages.length === 0 && (
           <p className="text-gray-500">
@@ -97,10 +93,10 @@ export default function Home() {
         <div ref={bottomRef} />
       </div>
 
-      {/* تحويل الحاوية إلى فورم وحل مشكلة الـ z-index للموبايل */}
+
       <form
         onSubmit={(e) => {
-          e.preventDefault(); // منع تحديث الصفحة عند الإرسال
+          e.preventDefault();
           sendMessage();
         }}
         className="sticky bottom-0 z-50 flex gap-2 border-t bg-white p-2"
@@ -114,11 +110,10 @@ export default function Home() {
         />
 
         <button
-          type="submit" /* تحويل الزرار لنوع submit ليتحكم بالفورم تلقائياً */
+          type="submit" 
           disabled={loading}
           className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
         >
-          {/* إضافة pointer-events-none للأيقونة لضمان وصول النقرة للزرار مباشرة */}
           <FontAwesomeIcon icon={faPaperPlane} className="pointer-events-none" />
         </button>
       </form>
