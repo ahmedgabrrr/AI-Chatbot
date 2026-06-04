@@ -64,9 +64,9 @@ export default function Home() {
   };
 
   return (
-    <main className="mx-auto flex h-screen max-w-4xl flex-col p-4">
+    <main className="mx-auto flex h-[dvh] max-w-4xl flex-col p-4 justify-between">
 
-      <div className="h-[75vh] overflow-y-auto rounded-lg border p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto rounded-lg border p-4 space-y-3 mb-2">
         {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
@@ -106,13 +106,13 @@ export default function Home() {
           value={input}
           placeholder="Ask anything..."
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 rounded-lg border p-3"
+          className="flex-1 rounded-lg border p-3 min-w-0"
         />
 
         <button
           type="submit" 
           disabled={loading}
-          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-sky-800 px-4 py-3 text-white disabled:opacity-50 shrink-0"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="pointer-events-none" />
         </button>
