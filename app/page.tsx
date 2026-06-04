@@ -23,54 +23,68 @@ export default function Home() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-    
+
     const userMessage: Message = {
       role: "user",
       content: input,
     };
-    
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+
+
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
 
     try {
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: updatedMessages,
+          messages: [...messages, userMessage],
         })
       });
 
+      
       if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
+        const errorText = await res.text();
+        throw new Error(`سيرفر Vercel أرجع خطأ (${res.status}): ${errorText}`);
       }
 
+     
       const data = await res.json();
-      const replyText = data.text || data.reply || data.response || (data.choices && data.choices[0]?.message?.content) || "No response text";
+
+  
+      const replyText = data?.text || data?.reply || data?.response || (data?.choices && data?.choices[0]?.message?.content);
+
+      if (!replyText) {
+        throw new Error("الطلب نجح ولكن السيرفر أرسل رداً فارغاً! تأكد من ملف api/chat");
+      }
 
       const aiMessage: Message = {
         role: "assistant",
         content: replyText,
       };
+
+   
       setMessages((prev) => [...prev, aiMessage]);
+
     } catch (error) {
-      console.error(error);
+      console.error("مخطط الخطأ في الموبايل:", error);
+
+    
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `Error: ${error instanceof Error ? error.message : "Connection failed"}`,
+          content: `⚠️ تنبيه من الموبايل - ${error instanceof Error ? error.message : "انقطع الاتصال بالـ API"}`,
         },
       ]);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <main className="mx-auto flex h-[dvh] max-w-4xl flex-col p-4 justify-between">
 
