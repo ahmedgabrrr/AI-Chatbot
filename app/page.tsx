@@ -71,11 +71,11 @@ export default function Home() {
 
   }
   return (
-    <main className="mx-auto flex h-dvh w-full max-w-4xl flex-col p-2 md:p-4">
+    <main className="border-4 border-red-500 mx-auto flex h-dvh w-full max-w-4xl flex-col p-2 md:p-4">
       {/* <Image className="h-40 w-80" src={avatar} alt="avatar" /> */}
 
 
-      <div className="mb-4 h-[70vh] overflow-y-auto rounded-lg border p-4 ">
+      <div className="border-4 border-blue-500 mb-4 h-[60vh] space-y-4 overflow-y-auto rounded-lg border p-4 ">
         {messages.length === 0 && (
           <p className="text-gray-500">
             GaBooRa is an AI chatbot , Ask me anything...
