@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GaBooRa AI Chatbot
+
+GaBooRa AI is a responsive, high-fidelity AI chat interface built on Next.js, Tailwind CSS (v4), and the Google Gemini API. It is designed to look premium, professional, and work across all device form factors.
+
+---
+
+## Key Features
+
+- **📱 Fully Responsive Design**: Built with mobile-first principles. Features a persistent side navigation panel on desktop viewports and a smooth-sliding drawer sidebar on mobile screens.
+- **💾 Session Persistence**: Supports creating, switching, renaming, and deleting multiple chat sessions. Conversions are cached and loaded via the browser's `localStorage` to ensure they persist across page refreshes.
+- **✨ Smart Auto-Naming**: Automatically renames new conversations from "New Chat" to a summary of the first sent prompt.
+- **🌓 Theme Toggle**: Implemented visual mode controls (dark/light mode) with preference persistence and system theme defaults.
+- **📝 Custom Markdown Engine**: Render formatted assistant responses cleanly without heavy dependencies:
+  - Formats headers, paragraphs, and list formats.
+  - Renders tabular markdown tables.
+  - Packages code blocks in editors showing language titles and a **Copy Code** button.
+- **💡 Suggested Prompts**: Provides interactive quick-starter templates when opening a new chat window.
+- **⌨️ Multi-line Autosizing Input**: Custom input textarea that grows dynamically as you write longer prompts.
+
+---
+
+## Directory Structure
+
+```text
+├── app/
+│   ├── api/chat/route.ts      # Gemini API model invocation endpoint
+│   ├── globals.css            # Stylesheets, custom scrollbars, animations
+│   ├── layout.tsx             # Fonts and fontawesome wrappers
+│   └── page.tsx               # Main chat application page and layout controller
+├── components/
+│   ├── Sidebar.tsx            # Session list drawer, actions, and settings
+│   ├── MessageBubble.tsx      # User/assistant bubbles, timestamps, status indicator
+│   ├── Markdown.tsx           # Custom parser for formatting and copy blocks
+│   ├── SuggestedPrompts.tsx   # Interactive preset card grids
+│   └── ThemeToggle.tsx        # Light/dark mode button
+├── lib/
+│   ├── gemini.ts              # Google GenAI model setup
+│   ├── utils.ts               # Tailwind merge class resolver
+│   └── fontawesome.ts         # FontAwesome config rules
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 1. Configure API Credentials
+Create a `.env` file in the root directory and add your Google Gemini API Key:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Build for Production
+To bundle and optimize the application:
+```bash
+npm run build
+npm start
+```
