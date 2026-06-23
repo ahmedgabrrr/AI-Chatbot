@@ -165,7 +165,8 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+      const res = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
