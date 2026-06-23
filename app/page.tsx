@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, Bot, SendHorizontal, Sparkles, Trash2, ShieldAlert } from "lucide-react";
+import { Menu, Bot, SendHorizontal, Sparkles, Trash2 } from "lucide-react";
 import Sidebar, { ChatSession } from "@/components/Sidebar";
 import MessageBubble from "@/components/MessageBubble";
 import SuggestedPrompts from "@/components/SuggestedPrompts";
@@ -23,7 +23,6 @@ export default function Home() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load sessions from localStorage on mount
   useEffect(() => {
     setIsMounted(true);
     const stored = localStorage.getItem("gaboorachat_sessions");
@@ -45,14 +44,13 @@ export default function Home() {
     }
   }, []);
 
-  // Save sessions to localStorage whenever they change
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("gaboorachat_sessions", JSON.stringify(sessions));
     }
   }, [sessions, isMounted]);
 
-  // Scroll to bottom when messages change or loading state changes
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -78,12 +76,11 @@ export default function Home() {
   const deleteSession = (id: string) => {
     const filtered = sessions.filter((s) => s.id !== id);
     setSessions(filtered);
-    
+
     if (activeSessionId === id) {
       if (filtered.length > 0) {
         setActiveSessionId(filtered[0].id);
       } else {
-        // If no sessions remain, create a new one
         const newSessionId = Math.random().toString(36).substring(2, 9) + Date.now();
         const newSession: ChatSession = {
           id: newSessionId,
@@ -144,10 +141,8 @@ export default function Home() {
       timestamp: time,
     };
 
-    // Update active session messages
     const updatedMessages = [...activeMessages, userMsg];
-    
-    // Auto-rename session if it's currently "New Chat"
+
     let newTitle = activeSession?.title || "New Chat";
     if (newTitle === "New Chat") {
       newTitle = textToSend.slice(0, 30);
@@ -175,32 +170,75 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: updatedMessages.map(({ role, content }) => ({ role, content })),
+          messages: updatedMessages
+            .filter(({ content }) => content && content.trim() !== "")
+            .map(({ role, content }) => ({ role, content })),
         }),
       });
 
-      if (!res.ok) throw new Error("Failed response from server");
+      if (!res.ok) {
+        let errorMessage = "Sorry, I encountered an issue generating a response. Please check your network and try again.";
+        try {
+          const errorData = await res.json();
+          if (errorData?.error) {
+            errorMessage = errorData.error;
+          }
+        } catch (_) { }
+        throw new Error(errorMessage);
+      }
 
-      const data = await res.json();
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) {
+        throw new Error("Response stream is not readable.");
+      }
+
       const aiTime = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
 
-      const aiMsg: Message = {
+      const newAiMsg: Message = {
         role: "assistant",
-        content: data.text || "No response received.",
+        content: "",
         timestamp: aiTime,
       };
 
       setSessions((prev) =>
         prev.map((s) =>
           s.id === activeSessionId
-            ? { ...s, messages: [...updatedMessages, aiMsg] }
+            ? { ...s, messages: [...updatedMessages, newAiMsg] }
             : s
         )
       );
-    } catch (err) {
+
+      setLoading(false);
+
+      let accumulatedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+        console.log(accumulatedText)
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === activeSessionId
+              ? {
+                ...s,
+                messages: s.messages.map((msg, idx) =>
+                  idx === s.messages.length - 1 && msg.role === "assistant"
+                    ? { ...msg, content: accumulatedText }
+                    : msg
+                ),
+              }
+              : s
+          )
+        );
+      }
+    } catch (err: any) {
       console.error(err);
       const aiTime = new Date().toLocaleTimeString([], {
         hour: "2-digit",
@@ -209,16 +247,26 @@ export default function Home() {
 
       const errorMsg: Message = {
         role: "assistant",
-        content: "Sorry, I encountered an issue generating a response. Please check your network and try again.",
+        content: err?.message || "Sorry, I encountered an issue generating a response. Please check your network and try again.",
         timestamp: aiTime,
       };
 
       setSessions((prev) =>
-        prev.map((s) =>
-          s.id === activeSessionId
-            ? { ...s, messages: [...updatedMessages, errorMsg] }
-            : s
-        )
+        prev.map((s) => {
+          if (s.id !== activeSessionId) return s;
+          const msgs = s.messages;
+          const lastMsg = msgs[msgs.length - 1];
+          if (lastMsg && lastMsg.role === "assistant" && lastMsg.content === "") {
+            return {
+              ...s,
+              messages: msgs.map((msg, idx) =>
+                idx === msgs.length - 1 ? errorMsg : msg
+              ),
+            };
+          } else {
+            return { ...s, messages: [...updatedMessages, errorMsg] };
+          }
+        })
       );
     } finally {
       setLoading(false);
@@ -239,7 +287,6 @@ export default function Home() {
   };
 
   if (!isMounted) {
-    // Return standard skeleton shell during server-side render to prevent flash
     return (
       <div className="flex h-screen w-screen bg-background items-center justify-center">
         <Bot className="w-12 h-12 text-primary animate-pulse" />
@@ -249,7 +296,6 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
-      {/* Sidebar drawer / aside */}
       <Sidebar
         sessions={sessions}
         activeSessionId={activeSessionId}
@@ -261,9 +307,7 @@ export default function Home() {
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main chat window */}
       <main className="flex-1 flex flex-col h-full min-w-0 bg-background relative">
-        {/* Top Header Navigation */}
         <header className="flex items-center justify-between border-b border-border bg-card px-4 h-16 shrink-0 z-30">
           <div className="flex items-center gap-3">
             <button
@@ -282,13 +326,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Model picker & options */}
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground/80">
               <Bot className="w-3.5 h-3.5 text-primary" />
-              <span>Gemini 3.5 Flash</span>
+              <span>Gemini 2.0 Flash</span>
             </div>
-            
+
             {activeMessages.length > 0 && (
               <button
                 onClick={clearActiveChat}
@@ -301,7 +344,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Message feed / Area */}
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-6">
           {activeMessages.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4 max-w-2xl mx-auto space-y-6 animate-fade-in-up">
@@ -317,7 +359,6 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Suggestions grid */}
               <div className="w-full pt-4">
                 <SuggestedPrompts onSelectPrompt={handleSelectPrompt} />
               </div>
@@ -339,7 +380,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* Floating / Grounded Input Bar */}
         <div className="p-4 md:p-6 border-t border-border/80 bg-gradient-to-t from-background via-background to-background/50">
           <div className="max-w-3xl mx-auto">
             <div className="relative flex items-end gap-2 p-1.5 rounded-2xl bg-card border border-border shadow-lg shadow-black/5 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-200">

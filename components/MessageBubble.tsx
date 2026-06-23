@@ -34,8 +34,8 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
   return (
     <div
       className={`flex gap-3 md:gap-4 w-full animate-fade-in-up py-4 px-2 md:px-4 rounded-2xl transition-all ${isUser
-          ? "flex-row-reverse"
-          : "bg-secondary/20 hover:bg-secondary/35 border border-border/20"
+        ? "flex-row-reverse"
+        : "bg-secondary/20 hover:bg-secondary/35 border border-border/20"
         }`}
     >
 
@@ -74,8 +74,8 @@ export default function MessageBubble({ message, isLoading = false }: MessageBub
 
         <div
           className={`relative rounded-2xl px-4 py-3 shadow-sm ${isUser
-              ? "bg-gradient-to-r from-primary to-indigo-600 text-primary-foreground rounded-tr-none"
-              : "bg-card text-foreground border border-border rounded-tl-none w-full"
+            ? "bg-gradient-to-r from-primary to-indigo-600 text-primary-foreground rounded-tr-none"
+            : "bg-card text-foreground border border-border rounded-tl-none w-full"
             }`}
         >
           {isLoading ? (
