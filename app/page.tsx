@@ -5,6 +5,7 @@ import { Menu, Bot, SendHorizontal, Sparkles, Trash2 } from "lucide-react";
 import Sidebar, { ChatSession } from "@/components/Sidebar";
 import MessageBubble from "@/components/MessageBubble";
 import SuggestedPrompts from "@/components/SuggestedPrompts";
+import Link from "next/link";
 
 type Message = {
   role: "user" | "assistant";
@@ -329,7 +330,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary border border-border text-xs font-semibold text-foreground/80">
               <Bot className="w-3.5 h-3.5 text-primary" />
-              <span>Gemini 2.0 Flash</span>
+
             </div>
 
             {activeMessages.length > 0 && (
@@ -404,7 +405,7 @@ export default function Home() {
               </button>
             </div>
             <p className="text-[10px] text-center text-muted-foreground/60 mt-2.5">
-              GaBooRa AI can make mistakes. Verify important information.
+              GaBooRa AI can make mistakes. developed by &copy; <Link href="https://wa.me/201064907076" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Ahmed Gabr</Link> 2026.
             </p>
           </div>
         </div>
